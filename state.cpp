@@ -185,10 +185,10 @@ void state::solve()
                 }
                 else
                 {
-                    // cout << "avoided undo " << endl;
                     undo++;
                 }
             }
         }
     }
+    cout << "no solution found in " << count << " permutations " << endl;
 }
