@@ -18,6 +18,9 @@ struct state
     void printCube();
     void turn(string &);
     void turn(int[8], int[4]);
+    int compare();
     void solve();
+    void calculateMisplaced();
+    void findShortest();
 };
 #endif

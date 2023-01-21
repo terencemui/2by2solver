@@ -119,6 +119,20 @@ void state::turn(int tape[8], int face[4])
     cube[face[3]] = temp;
 }
 
+int state::compare()
+{
+    int misplaced = 0;
+    string key = "RRRRGGGGYYYYBBBBWWWWOOOO";
+    for (int i = 0; i < key.size(); ++i)
+    {
+        if (key[i] == cube[i])
+        {
+            misplaced++;
+        }
+    }
+    return misplaced;
+}
+
 void state::solve()
 {
     // pop from the queue
@@ -154,8 +168,8 @@ void state::solve()
         {
             cout << "visited: " << visited.size() << " repeated: " << repeated << endl;
             cout << "solved in " << currState.moves.size() << " moves" << endl
-                 << "checked " << count << " iterations" << endl
-                 << "avoided " << undo << " undos" << endl;
+                 << "checked " << count << " iterations" << endl;
+            //  << "avoided " << undo << " undos" << endl;
             for (unsigned int i = 0; i < currState.moves.size(); ++i)
             {
                 cout << currState.moves[i] << " ";
@@ -190,5 +204,116 @@ void state::solve()
             }
         }
     }
-    cout << "no solution found in " << count << " permutations " << endl;
+    cout << "no solution found in " << count << " permutations " << endl
+         << currState.moves.size() << " moves" << endl;
+}
+
+void state::calculateMisplaced()
+{
+    queue<state> q;
+    state tempState = state();
+    q.push(tempState);
+
+    unordered_set<string> visited;
+    visited.insert(tempState.cube);
+
+    state solved;
+    state currState;
+
+    string rotations[6] = {"R", "R'", "U", "U'", "F", "F'"};
+
+    int sum[16]{};
+    int count[16]{};
+
+    cout << sum[0] << endl;
+
+    // int sum = 0;
+    // int count = 0;
+
+    int revisited = 0;
+
+    while (!q.empty())
+    {
+        currState = q.front();
+        q.pop();
+
+        // compare currState
+        // add misplaced to the sum
+
+        // cout << "moves: " << currState.moves.size() << " misplaced: " << currState.compare() << endl;
+
+        // if (currState.moves.size() == 16)
+        // {
+        //     for (unsigned int i = 0; i < 15; ++i)
+        //     {
+        //         cout << sum[i] << " " << count[i] << " " << "mean: " << sum[i] / count[i] << endl;
+        //     }
+        //     // return;
+        // }
+
+        // sum[currState.moves.size()] += currState.compare();
+        // count[currState.moves.size()]++;
+
+        for (unsigned int i = 0; i < 6; ++i)
+        {
+            if (rotations[i] != currState.moves.back())
+            {
+                state newState = state(currState.cube, currState.moves);
+                newState.turn(rotations[i]);
+                newState.moves.push_back(rotations[i]);
+                // if it doesn't exist already, add it to the queue
+                if (visited.count(newState.cube) == 0)
+                {
+                    q.push(newState);
+                    visited.insert(newState.cube);
+                }
+                else
+                {
+                    revisited++;
+                }
+            }
+        }
+    }
+    cout << "revisited: " << revisited << endl;
+
+    // cout << sum << " " << count << " " << "mean: " << sum / count << endl;
+
+    // cout << "test" << endl;
+
+    // for (unsigned int i = 0; i < 16; ++i)
+    // {
+    //     cout << sum[i] / count[i] << " ";
+    // }
+    // cout << endl;
+}
+
+void state::findShortest()
+{
+    // 20 possible options
+
+    int cubettes[7][3] = {2, 5, 8, 3, 9, 12, 7, 10, 20, 11, 14, 21, 15, 18, 23, 6, 22, 19, 1, 13, 16};
+
+    int currPos[3];
+    int goalPos[3];
+
+    for (unsigned int i = 0; i < 3; ++i)
+    {
+        currPos[i] = cubettes[0][i];
+    }
+
+    char currColor[3];
+    char goalColor[3];
+
+    // if curr = goal, return num of moves
+    // else, move 6 ways
+    // if it isn't in the set, add to queue
+    // increment moveCounter
+
+
+    // if (currColor == goalPos)
+    // {
+
+    // }
+
+
 }

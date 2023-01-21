@@ -26,6 +26,7 @@ int main()
 
     auto start = chrono::high_resolution_clock::now();
     cube.solve();
+    // cube.calculateMisplaced();
     auto end = chrono::high_resolution_clock::now();
     auto diff = end - start;
 
