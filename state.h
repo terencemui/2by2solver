@@ -20,7 +20,12 @@ struct state
     void turn(int[8], int[4]);
     int compare();
     void solve();
-    void calculateMisplaced();
-    void findShortest();
+    string inverseTurn(string);
+    // void calculateMisplaced();
+    // void findShortest();
+    // void findPos(char[], int[]);
+    bool checkCubette(int[]);
+
+    int findHeuristic();
 };
 #endif

@@ -12,7 +12,9 @@ int main()
 
     string possibleMoves[6] = {"R", "R'", "U", "U'", "F", "F'"};
 
-    vector<int> moveList = {0, 5, 2, 1, 4, 4, 2, 5, 0, 2, 2, 5, 3, 5, 2};
+    // vector<int> moveList = {0, 5, 2, 1, 4, 4, 2, 5, 0, 2, 2, 5, 3, 5, 2};
+    vector<int> moveList = {0, 2};
+    // vector<int> moveList = {0, 2};
 
     for (unsigned int i = 0; i < moveList.size(); ++i)
     {
@@ -25,6 +27,9 @@ int main()
     
 
     auto start = chrono::high_resolution_clock::now();
+    // cube.findShortest();
+    // cout << cube.findHeuristic() << endl;
+    // cube.inverseTurn("R");
     cube.solve();
     // cube.calculateMisplaced();
     auto end = chrono::high_resolution_clock::now();
