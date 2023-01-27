@@ -18,13 +18,14 @@ struct state
     void printCube();
     void turn(string);
     void turn(int[8], int[4]);
-    int compare();
     void solve();
-    // void calculateMisplaced();
-    // void findShortest();
-    // void findPos(char[], int[]);
-    bool checkCubette(int[]);
+    void reverse(vector<string>&);
 
-    int findHeuristic();
+    // int compare();
+    // void solve();
+    // bool checkCubette(int[]);
+    // int findHeuristic();
+    // int test();
+
 };
 #endif
