@@ -10,7 +10,7 @@ using namespace std;
 void testBench();
 int main()
 {
-    // srand(time(0));
+    srand(time(0));
 
     // state cube;
     // vector<string> scramble;
