@@ -7,43 +7,60 @@
 
 using namespace std;
 // using namespace std;
-
+void testBench();
 int main()
 {
-    state cube;
-    string possibleMoves[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
+    // srand(time(0));
 
-    srand(time(0));
-    int numMoves = 20;
-    vector<int> moveList(numMoves);
-    for (int i = 0; i <numMoves; ++i)
-    {
-        moveList.at(i) = rand() % 9;
-    }
+    // state cube;
+    // vector<string> scramble;
+    // vector<string> solution;
 
-    cout << "Scramble: ";
-    for (unsigned int i = 0; i < moveList.size(); ++i)
-    {
-        cout << possibleMoves[moveList[i]] << " ";
-        cube.turn(possibleMoves[moveList[i]]);
-    }
-    cout << endl;
+    // cube.scramble(scramble);
+    // cube.solve(solution);
 
-    cube.printCube();
+    // cout << "Scramble: ";
+    // for (unsigned int i = 0; i < scramble.size(); ++i)
+    // {
+    //     cout << scramble.at(i) << " ";
+    // }
+    // cout << endl;
 
+    // cout << "Solved in " << solution.size() << " moves: " << endl;
+    // for (unsigned int i = 0; i < solution.size(); ++i)
+    // {
+    //     cout << solution.at(i) << " ";
+    // }
+    // cout << endl;
+
+    testBench();
+
+    return 0;
+}
+
+void testBench()
+{
     auto start = chrono::high_resolution_clock::now();
-    // cube.findShortest();
-    // cout << cube.findHeuristic() << endl;
-    // cube.inverseTurn("R");
-    // cube.solve();
-    cube.solveMiddle();
-    // cube.printCube();
-    // cout << cube.test() << endl;;
+
+    int tests = 20;
+    vector<string> solution;
+    vector<string> scramble;
+    int moves = 0;
+
+    for (int i = 0; i < tests; ++i)
+    {
+        solution = {};
+        scramble = {};
+        state cube;
+        cube.scramble(scramble);
+        // cube.printCube();
+        cube.solve(solution);
+        moves += solution.size();
+    }
 
     auto end = chrono::high_resolution_clock::now();
     auto diff = end - start;
-
-    cout << chrono::duration<double>(diff).count() << " seconds " << endl;
-
-    return 0;
+    cout << "Total tests: " << tests << endl
+         << "Average moves: " << moves / tests << endl
+         << "Average time: " << chrono::duration<double>(diff).count() / tests << " seconds " << endl;
 }

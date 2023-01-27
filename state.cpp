@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <queue>
 #include <string>
+#include <time.h>
+#include <random>
 
 state::state()
 {
@@ -135,7 +137,7 @@ void state::turn(int tape[8], int face[4])
     cube[face[3]] = temp;
 }
 
-void state::solve()
+void state::solve(vector<string> &output)
 {
     string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
 
@@ -171,23 +173,18 @@ void state::solve()
 
         if (findScrambled != scrambledMap.end()) // if in scrambledMap
         {
-            // cout << "solution found: " << endl;
         }
         else if (findScramSolv != solvedMap.end()) // if scrambled is in solvedMap
-        // else if (findSolved != solvedMap.end())
         {
-            cout << "solution found in  " << currScrambled.moves.size() + findScramSolv->second.size() << " moves" << endl
-                 << "visited: " << scrambledMap.size() + solvedMap.size() << endl;
             for (unsigned int i = 0; i < currScrambled.moves.size(); ++i)
             {
-                cout << currScrambled.moves[i] << " ";
+                output.push_back(currScrambled.moves.at(i));
             }
             reverse(findScramSolv->second);
             for (unsigned int i = 0; i < findScramSolv->second.size(); ++i)
             {
-                cout << findScramSolv->second.at(i) << " ";
+                output.push_back(findScramSolv->second.at(i));
             }
-            cout << endl;
             return;
         }
         else
@@ -215,18 +212,15 @@ void state::solve()
         }
         else if (findSolvScram != scrambledMap.end())
         {
-            cout << "solution found in " << currSolved.moves.size() + findSolvScram->second.size() << " moves" << endl
-                 << "visited: " << scrambledMap.size() + solvedMap.size() << endl;
             for (unsigned int i = 0; i < findSolvScram->second.size(); ++i)
             {
-                cout << findSolvScram->second.at(i) << " ";
+                output.push_back(findSolvScram->second.at(i));
             }
             reverse(currSolved.moves);
             for (unsigned int i = 0; i < currSolved.moves.size(); ++i)
             {
-                cout << currSolved.moves[i] << " ";
+                output.push_back(currSolved.moves.at(i));
             }
-            cout << endl;
             return;
         }
         else
@@ -272,6 +266,37 @@ void state::reverse(vector<string> &turns)
         }
     }
     turns = temp;
+}
+
+void state::scramble(vector<string>& scramble)
+{
+    if (scramble.size() != 0)
+    {
+        return;
+    }
+    string possibleMoves[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
+
+    int numMoves = 20;
+    scramble.reserve(numMoves);
+    char temp = ' ';
+    string move;
+    for (int i = 0; i < numMoves; ++i)
+    {
+        if (scramble.size() != 0)
+        {
+            temp = scramble.back().at(0);
+        }
+        move = possibleMoves[rand() % 9];
+        if (move.at(0) != temp)
+        {
+            scramble.push_back(move);
+            turn(move);
+        }
+        else
+        {
+            --i;
+        }
+    }
 }
 
 // int state::compare()
