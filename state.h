@@ -16,11 +16,10 @@ struct state
     state(string&, vector<string> moves);
 
     void printCube();
-    void turn(string &);
+    void turn(string);
     void turn(int[8], int[4]);
-    int compare();
-    void solve();
-    void calculateMisplaced();
-    void findShortest();
+    void solve(vector<string>&);
+    void reverse(vector<string>&);
+    void scramble(vector<string>&);
 };
 #endif
