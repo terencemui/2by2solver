@@ -7,7 +7,7 @@
 
 using namespace std;
 // using namespace std;
-void testBench();
+void testBench(int );
 int main()
 {
     srand(time(0));
@@ -17,8 +17,6 @@ int main()
     // vector<string> solution;
 
     // cube.scramble(scramble);
-    // cube.solve(solution);
-
     // cout << "Scramble: ";
     // for (unsigned int i = 0; i < scramble.size(); ++i)
     // {
@@ -26,6 +24,7 @@ int main()
     // }
     // cout << endl;
 
+    // cube.solve(solution);
     // cout << "Solved in " << solution.size() << " moves: " << endl;
     // for (unsigned int i = 0; i < solution.size(); ++i)
     // {
@@ -33,34 +32,36 @@ int main()
     // }
     // cout << endl;
 
-    testBench();
+    testBench(100);
 
     return 0;
 }
 
-void testBench()
+void testBench(int num)
 {
     auto start = chrono::high_resolution_clock::now();
 
-    int tests = 20;
     vector<string> solution;
     vector<string> scramble;
     int moves = 0;
+    int visited = 0;
 
-    for (int i = 0; i < tests; ++i)
+    for (int i = 0; i < num; ++i)
     {
         solution = {};
         scramble = {};
         state cube;
         cube.scramble(scramble);
         // cube.printCube();
-        cube.solve(solution);
+        visited += cube.solve(solution);
         moves += solution.size();
     }
 
     auto end = chrono::high_resolution_clock::now();
     auto diff = end - start;
-    cout << "Total tests: " << tests << endl
-         << "Average moves: " << moves / tests << endl
-         << "Average time: " << chrono::duration<double>(diff).count() / tests << " seconds " << endl;
+    cout << "Total tests: " << num << endl
+         << "Average moves: " << moves / num << endl
+         << "Average time: " << chrono::duration<double>(diff).count() / num << " seconds " << endl
+         << "Average visited: " << visited / num << endl
+         << "Average visited per second: " << visited / num / (chrono::duration<double>(diff).count() / num) << endl;
 }

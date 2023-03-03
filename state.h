@@ -18,7 +18,7 @@ struct state
     void printCube();
     void turn(string);
     void turn(int[8], int[4]);
-    void solve(vector<string>&);
+    int solve(vector<string>&);
     void reverse(vector<string>&);
     void scramble(vector<string>&);
 };
