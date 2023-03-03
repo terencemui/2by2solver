@@ -1,5 +1,4 @@
 #include "state.h"
-
 #include <iostream>
 #include <unordered_set>
 #include <unordered_map>
@@ -137,8 +136,9 @@ void state::turn(int tape[8], int face[4])
     cube[face[3]] = temp;
 }
 
-void state::solve(vector<string> &output)
+int state::solve(vector<string> &output)
 {
+    int visited = 0;
     string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
 
     char temp = ' ';
@@ -159,6 +159,7 @@ void state::solve(vector<string> &output)
 
     while (!scrambledQ.empty())
     {
+        visited += 2;
         currScrambled = scrambledQ.front();
         scrambledQ.pop();
 
@@ -185,7 +186,7 @@ void state::solve(vector<string> &output)
             {
                 output.push_back(findScramSolv->second.at(i));
             }
-            return;
+            return visited;
         }
         else
         {
@@ -221,7 +222,7 @@ void state::solve(vector<string> &output)
             {
                 output.push_back(currSolved.moves.at(i));
             }
-            return;
+            return visited;
         }
         else
         {
@@ -243,6 +244,7 @@ void state::solve(vector<string> &output)
             }
         }
     }
+    return 0;
 }
 
 void state::reverse(vector<string> &turns)
@@ -268,7 +270,7 @@ void state::reverse(vector<string> &turns)
     turns = temp;
 }
 
-void state::scramble(vector<string>& scramble)
+void state::scramble(vector<string> &scramble)
 {
     if (scramble.size() != 0)
     {
