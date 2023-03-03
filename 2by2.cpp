@@ -1,41 +1,67 @@
 #include <iostream>
 #include <unordered_set>
 #include <chrono>
+#include <time.h>
+#include <random>
 #include "state.h"
 
 using namespace std;
 // using namespace std;
-
+void testBench(int );
 int main()
 {
-    state cube;
+    srand(time(0));
 
-    string possibleMoves[6] = {"R", "R'", "U", "U'", "F", "F'"};
+    // state cube;
+    // vector<string> scramble;
+    // vector<string> solution;
 
-    // vector<int> moveList = {0, 5, 2, 1, 4, 4, 2, 5, 0, 2, 2, 5, 3, 5, 2};
-    vector<int> moveList = {0, 2};
-    // vector<int> moveList = {0, 2};
+    // cube.scramble(scramble);
+    // cout << "Scramble: ";
+    // for (unsigned int i = 0; i < scramble.size(); ++i)
+    // {
+    //     cout << scramble.at(i) << " ";
+    // }
+    // cout << endl;
 
-    for (unsigned int i = 0; i < moveList.size(); ++i)
-    {
-        cout << possibleMoves[moveList[i]] << " ";
-        cube.turn(possibleMoves[moveList[i]]);
-    }
-    cout << endl;
+    // cube.solve(solution);
+    // cout << "Solved in " << solution.size() << " moves: " << endl;
+    // for (unsigned int i = 0; i < solution.size(); ++i)
+    // {
+    //     cout << solution.at(i) << " ";
+    // }
+    // cout << endl;
 
-    cube.printCube();
-    
-
-    auto start = chrono::high_resolution_clock::now();
-    // cube.findShortest();
-    // cout << cube.findHeuristic() << endl;
-    // cube.inverseTurn("R");
-    cube.solve();
-    // cube.calculateMisplaced();
-    auto end = chrono::high_resolution_clock::now();
-    auto diff = end - start;
-
-    cout << chrono::duration <double> (diff).count() << " seconds " << endl;
+    testBench(100);
 
     return 0;
+}
+
+void testBench(int num)
+{
+    auto start = chrono::high_resolution_clock::now();
+
+    vector<string> solution;
+    vector<string> scramble;
+    int moves = 0;
+    int visited = 0;
+
+    for (int i = 0; i < num; ++i)
+    {
+        solution = {};
+        scramble = {};
+        state cube;
+        cube.scramble(scramble);
+        // cube.printCube();
+        visited += cube.solve(solution);
+        moves += solution.size();
+    }
+
+    auto end = chrono::high_resolution_clock::now();
+    auto diff = end - start;
+    cout << "Total tests: " << num << endl
+         << "Average moves: " << moves / num << endl
+         << "Average time: " << chrono::duration<double>(diff).count() / num << " seconds " << endl
+         << "Average visited: " << visited / num << endl
+         << "Average visited per second: " << visited / num / (chrono::duration<double>(diff).count() / num) << endl;
 }
