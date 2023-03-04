@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -17,9 +18,10 @@ struct state
 
     void printCube();
     void turn(string);
-    void turn(int[8], int[4]);
+    void _turn(int[8], int[4]);
     int solve(vector<string>&);
     void reverse(vector<string>&);
     void scramble(vector<string>&);
+    void move(state, queue<state>&);
 };
 #endif

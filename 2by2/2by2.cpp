@@ -7,31 +7,10 @@
 
 using namespace std;
 // using namespace std;
-void testBench(int );
+void testBench(int);
 int main()
 {
     srand(time(0));
-
-    // state cube;
-    // vector<string> scramble;
-    // vector<string> solution;
-
-    // cube.scramble(scramble);
-    // cout << "Scramble: ";
-    // for (unsigned int i = 0; i < scramble.size(); ++i)
-    // {
-    //     cout << scramble.at(i) << " ";
-    // }
-    // cout << endl;
-
-    // cube.solve(solution);
-    // cout << "Solved in " << solution.size() << " moves: " << endl;
-    // for (unsigned int i = 0; i < solution.size(); ++i)
-    // {
-    //     cout << solution.at(i) << " ";
-    // }
-    // cout << endl;
-
     testBench(100);
 
     return 0;
@@ -45,6 +24,7 @@ void testBench(int num)
     vector<string> scramble;
     int moves = 0;
     int visited = 0;
+    bool print = false;
 
     for (int i = 0; i < num; ++i)
     {
@@ -57,6 +37,14 @@ void testBench(int num)
         moves += solution.size();
     }
 
+    if (print)
+    {
+        for (int i = 0; i < solution.size(); ++i)
+        {
+            cout << solution.at(i) << " ";
+        }
+        cout << endl;
+    }
     auto end = chrono::high_resolution_clock::now();
     auto diff = end - start;
     cout << "Total tests: " << num << endl
