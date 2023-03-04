@@ -9,12 +9,11 @@ using namespace std;
 
 struct state
 {
-    // char cube[24];
     string cube;
     vector<string> moves;
 
     state();
-    state(const string&, vector<string>&);
+    state(const string&, vector<string>);
 
     void printCube();
     void turn(const string &);

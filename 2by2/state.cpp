@@ -14,11 +14,8 @@ state::state()
     cube = "RRRRGGGGYYYYBBBBWWWWOOOO";
 }
 
-state::state(const string &c, vector<string>& m)
+state::state(const string &c, vector<string> m)
 {
-    // moves.reserve(20);
-    // cube = c;
-    // this->moves = m;
     moves = std::move(m);
     cube = c;
 }
@@ -64,7 +61,6 @@ void state::printCube()
 // RGW IS CENTER
 void state::turn(const string &direction)
 {
-
     // R
     if (direction == "R")
     {
@@ -154,7 +150,6 @@ void state::_turn(const int tape[8], const int face[4])
 int state::solve(vector<string> &output)
 {
     int visited = 0;
-    string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
 
     queue<state> scrambledQ;
     queue<state> solvedQ;
