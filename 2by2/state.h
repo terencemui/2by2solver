@@ -14,14 +14,14 @@ struct state
     vector<string> moves;
 
     state();
-    state(string&, vector<string> moves);
+    state(const string&, vector<string>&);
 
     void printCube();
-    void turn(string);
-    void _turn(int[8], int[4]);
+    void turn(const string &);
+    void _turn(const int[8], const int[4]);
     int solve(vector<string>&);
     void reverse(vector<string>&);
     void scramble(vector<string>&);
-    void move(state, queue<state>&);
+    void move(state&, queue<state>&);
 };
 #endif

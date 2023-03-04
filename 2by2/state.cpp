@@ -8,19 +8,19 @@
 #include <random>
 #include <thread>
 
-void test(state currState, string &move, queue<state> scrambledQ, char prev);
-
 state::state()
 {
     moves.reserve(20);
     cube = "RRRRGGGGYYYYBBBBWWWWOOOO";
 }
 
-state::state(string &c, vector<string> m)
+state::state(const string &c, vector<string>& m)
 {
-    moves.reserve(20);
+    // moves.reserve(20);
+    // cube = c;
+    // this->moves = m;
+    moves = std::move(m);
     cube = c;
-    this->moves = m;
 }
 
 void state::printCube()
@@ -62,9 +62,9 @@ void state::printCube()
     cout << endl;
 }
 // RGW IS CENTER
-void state::turn(string direction)
+void state::turn(const string &direction)
 {
-    // cout << "test" << endl;
+
     // R
     if (direction == "R")
     {
@@ -127,11 +127,10 @@ void state::turn(string direction)
     {
         cout << "Invalid direction: " << direction << endl;
     }
-    this->moves.push_back(direction);
-    // cout << "pushing back: " << direction << endl;
+    moves.push_back(direction);
 }
 
-void state::_turn(int tape[8], int face[4])
+void state::_turn(const int tape[8], const int face[4])
 {
     char temp;
     for (int j = 0; j < 2; ++j)
@@ -168,8 +167,6 @@ int state::solve(vector<string> &output)
 
     unordered_map<string, vector<string>> scrambledMap;
     unordered_map<string, vector<string>> solvedMap;
-
-    // solvedMap.insert({currSolved.cube, currSolved.moves});
 
     while (!scrambledQ.empty())
     {
@@ -238,50 +235,6 @@ int state::solve(vector<string> &output)
             solvedMap.insert({currSolved.cube, currSolved.moves});
             move(currSolved, solvedQ);
         }
-
-            // if (findScrambled != scrambledMap.end()) // if in scrambledMap
-            // {
-            // }
-            // else if (findScramSolv != solvedMap.end()) // if scrambled is in solvedMap
-            // {
-            //     for (unsigned int i = 0; i < currScrambled.moves.size(); ++i)
-            //     {
-            //         output.push_back(currScrambled.moves.at(i));
-            //     }
-            //     reverse(findScramSolv->second);
-            //     for (unsigned int i = 0; i < findScramSolv->second.size(); ++i)
-            //     {
-            //         output.push_back(findScramSolv->second.at(i));
-            //     }
-            //     return visited;
-            // }
-            // else
-            // {
-            //     scrambledMap.insert({currScrambled.cube, currScrambled.moves});
-            //     move(currScrambled, scrambledQ);
-            // }
-
-            // if (findSolved != solvedMap.end())
-            // {
-            // }
-            // else if (findSolvScram != scrambledMap.end())
-            // {
-            //     for (unsigned int i = 0; i < findSolvScram->second.size(); ++i)
-            //     {
-            //         output.push_back(findSolvScram->second.at(i));
-            //     }
-            //     reverse(currSolved.moves);
-            //     for (unsigned int i = 0; i < currSolved.moves.size(); ++i)
-            //     {
-            //         output.push_back(currSolved.moves.at(i));
-            //     }
-            //     return visited;
-            // }
-            // else
-            // {
-            //     solvedMap.insert({currSolved.cube, currSolved.moves});
-            //     move(currSolved, solvedQ);
-            // }
     }
     return 0;
 }
@@ -346,7 +299,7 @@ void state::scramble(vector<string> &scramble)
     moves = {};
 }
 
-void state::move(state currState, queue<state> &currQ)
+void state::move(state &currState, queue<state> &currQ)
 {
     char temp;
     string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
@@ -365,253 +318,3 @@ void state::move(state currState, queue<state> &currQ)
         }
     }
 }
-
-// int state::compare()
-// {
-//     int misplaced = 0;
-//     string key = "RRRRGGGGYYYYBBBBWWWWOOOO";
-//     for (int i = 0; i < key.size(); ++i)
-//     {
-//         if (key[i] == cube[i])
-//         {
-//             misplaced++;
-//         }
-//     }
-//     return misplaced;
-// }
-
-// void state::solve()
-// {
-//     // pop from the queue
-//     // check the cube
-//     // turn it 6 ways
-//     // if it isn't in the set, add it to the queue
-
-//     queue<state> q;
-//     state tempState = state(cube, moves);
-//     q.push(tempState);
-
-//     unordered_set<string> visited;
-//     // visited.insert(tempState.cube);
-
-//     state solved;
-//     // solved.cube = "RRRRGGGGYYYYBBBBWWWWOOOJ";
-//     state currState;
-
-//     string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
-
-//     string input;
-//     int repeated = 0;
-
-//     while (!q.empty())
-//     {
-//         currState = q.front();
-//         q.pop();
-
-//         if (visited.count(currState.cube) == 1)
-//         {
-//             ++repeated;
-//         } // if it hasn't been visited
-//         else if (strcmp(currState.cube.c_str(), solved.cube.c_str()) == 0)
-//         {
-//             cout << "visited: " << visited.size() << " repeated: " << repeated << endl
-//                  << "solved in " << currState.moves.size() << " moves" << endl;
-//             for (unsigned int i = 0; i < currState.moves.size(); ++i)
-//             {
-//                 cout << currState.moves[i] << " ";
-//             }
-//             cout << endl;
-//             return;
-//         }
-//         else
-//         {
-//             visited.insert(currState.cube);
-//             for (unsigned int i = 0; i < 9; ++i)
-//             {
-//                 char temp = ' ';
-//                 if (currState.moves.size() != 0)
-//                 {
-//                     temp = (currState.moves.back()).at(0);
-//                 }
-//                 if (rotations[i].at(0) != temp)
-//                 {
-
-//                     state newState = state(currState.cube, currState.moves);
-//                     newState.turn(rotations[i]);
-//                     newState.moves.push_back(rotations[i]);
-//                     q.push(newState);
-//                 }
-//             }
-//         }
-//     }
-//     cout << "no solution found in " << visited.size() << " states " << endl
-//          << currState.moves.size() << " moves" << endl;
-// }
-
-// bool state::checkCubette(int pos[])
-// {
-//     state solved;
-//     for (int i = 0; i < 3; ++i)
-//     {
-//         if (solved.cube[pos[i]] != cube[pos[i]])
-//         {
-//             return false;
-//         }
-//     }
-//     return true;
-// }
-
-// int state::findHeuristic()
-// {
-//     int cubettes[7][3] = {2, 5, 8, 3, 9, 12, 7, 10, 20, 11, 14, 21, 15, 18, 23, 6, 22, 19, 1, 13, 16};
-
-//     int goalPos[3];
-//     int sum = 0;
-
-//     queue<state> q;
-//     state currState;
-//     state tempState;
-//     unordered_set<string> visited;
-//     string rotations[6] = {"R", "R'", "U", "U'", "F", "F'"};
-
-//     for (int i = 0; i < 7; ++i)
-//     {
-//         for (int j = 0; j < 3; ++j)
-//         {
-//             goalPos[j] = cubettes[i][j];
-//         }
-
-//         tempState = state(cube, moves);
-//         q.push(tempState);
-
-//         visited.insert(tempState.cube);
-
-//         while (!q.empty())
-//         {
-//             currState = q.front();
-//             q.pop();
-
-//             if (currState.checkCubette(goalPos))
-//             {
-//                 for (int k = 0; k < currState.moves.size(); ++k)
-//                 {
-//                     // cout << currState.moves.at(k) << " ";
-//                 }
-//                 // cout << endl;
-//                 sum += currState.moves.size();
-//                 sum -= moves.size();
-//                 q = {};
-//                 visited = {};
-//             }
-//             else
-//             {
-//                 for (int k = 0; k < 6; ++k)
-//                 {
-//                     if (rotations[k] != currState.moves.back())
-//                     {
-//                         state newState = state(currState.cube, currState.moves);
-//                         newState.turn(rotations[k]);
-//                         newState.moves.push_back(rotations[k]);
-//                         // if it doesn't exist already, add it to the queue
-//                         if (visited.count(newState.cube) == 0)
-//                         {
-//                             q.push(newState);
-//                             visited.insert(newState.cube);
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     // cout << "sum: " << sum / 4 << endl;
-//     return sum / 4;
-// }
-
-// int state::test()
-// {
-
-//     int sum = 0;
-//     int cubettes[7][3] = {3, 9, 12, 11, 14, 21, 7, 10, 20, 2, 5, 8, 1, 13, 16, 15, 18, 23, 6, 22, 19};
-
-//     state solved;
-
-//     unordered_map<string, int> solvedMap;
-//     unordered_map<string, int> currMap;
-
-//     vector<int> order;
-//     order.reserve(14);
-
-//     string curr;
-//     curr.reserve(3);
-//     string solvedStr;
-//     solvedStr.reserve(3);
-
-//     int i = 0;
-
-//     for (unsigned int i = 0; i < 7; ++i)
-//     {
-//         curr = "";
-//         solvedStr = "";
-//         for (unsigned int j = 0; j < 3; ++j)
-//         {
-//             curr.push_back(cube[cubettes[i][j]]);
-//             solvedStr.push_back(solved.cube[cubettes[i][j]]);
-//         }
-
-//         sort(curr.begin(), curr.end());
-//         sort(solvedStr.begin(), solvedStr.end());
-
-//         auto temp = currMap.find(solvedStr);
-
-//         if (temp != currMap.end()) // if solvedStr exists in curr
-//         {
-//             order.push_back(temp->second);
-//             order.push_back(i);
-//         }
-//         else
-//         {
-//             solvedMap.insert({solvedStr, i});
-//         }
-
-//         temp = solvedMap.find(curr);
-
-//         if (temp != solvedMap.end())
-//         {
-//             order.push_back(i);
-//             order.push_back(temp->second);
-//         }
-//         else
-//         {
-//             currMap.insert({curr, i});
-//         }
-//     }
-
-//     int diff;
-//     for (unsigned int i = 0; i < 7; ++i)
-//     {
-//         int pos1[2] = {order.at(i) / 4, order.at(i) % 4};
-//         int pos2[2] = {order.at(i + 1) / 4, order.at(i + 1) % 4};
-
-//         if (pos1[0] != pos2[0])
-//         {
-//             sum++;
-//         }
-//         diff = pos1[1] - pos2[1];
-//         if (diff == 2 || diff == -2)
-//         {
-//             sum += 2;
-//         }
-//         else if (diff == 0)
-//         {
-//             if (!checkCubette(cubettes[i]))
-//             {
-//                 sum += 2;
-//             }
-//         }
-//         else
-//         {
-//             ++sum; // can be fixed
-//         }
-//     }
-//     return sum / 4;
-// }
