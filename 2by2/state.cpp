@@ -8,6 +8,8 @@
 #include <random>
 #include <thread>
 
+// hello world
+
 state::state()
 {
     moves.reserve(20);
@@ -294,7 +296,7 @@ void state::scramble(vector<string> &scramble)
     moves = {};
 }
 
-void state::move(state &currState, queue<state> &currQ)
+void state::move(const state &currState, queue<state> &currQ)
 {
     char temp;
     string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
