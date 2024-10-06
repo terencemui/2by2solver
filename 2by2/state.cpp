@@ -1,38 +1,39 @@
 #include "state.h"
 #include <iostream>
-#include <unordered_set>
-#include <unordered_map>
-#include <queue>
-#include <string>
-#include <time.h>
 #include <random>
-#include <thread>
+#include <chrono>
+#include <unordered_map>
+#include <stack>
+#include <unordered_set>
 
-// hello world
-
-state::state()
+State::State()
 {
-    moves.reserve(20);
-    cube = "RRRRGGGGYYYYBBBBWWWWOOOO";
+    for (int i = 0; i < 24; ++i)
+    {
+        cube[i] = i;
+    }
 }
 
-state::state(const string &c, vector<string> m)
+State &State::operator=(const State &rhs)
 {
-    moves = std::move(m);
-    cube = c;
+    cube = rhs.cube;
+    moves = rhs.moves;
+    return *this;
 }
 
-void state::printCube()
+void State::printState()
 {
     // R
     for (unsigned int i = 0; i < 2; ++i)
     {
-        cout << "    ";
+        std::cout << "   ";
         for (unsigned int j = 0; j < 2; ++j)
         {
-            cout << cube[(i * 2) + j] << " ";
+            if (cube[(i * 2) + j] < 10)
+                std::cout << " ";
+            std::cout << cube[(i * 2) + j] << " ";
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
     // G,Y,B,W
@@ -42,95 +43,67 @@ void state::printCube()
         {
             for (unsigned int k = 0; k < 2; ++k)
             {
-                cout << cube[(i * 2 + j * 4 + k)] << " ";
+                if (cube[(i * 2 + j * 4 + k)] < 10)
+                    std::cout << " ";
+                std::cout << cube[(i * 2 + j * 4 + k)] << " ";
             }
         }
-        cout << endl;
+        std::cout << std::endl;
     }
 
     // O
     for (unsigned int i = 0; i < 2; ++i)
     {
-        cout << "    ";
+        std::cout << "   ";
         for (unsigned int j = 20; j < 22; ++j)
         {
-            cout << cube[(i * 2) + j] << " ";
+            if (cube[(i * 2) + j] < 10)
+                std::cout << " ";
+            std::cout << cube[(i * 2) + j] << " ";
         }
-        cout << endl;
+        std::cout << std::endl;
     }
-    cout << endl;
+    std::cout << std::endl;
 }
-// RGW IS CENTER
-void state::turn(const string &direction)
+
+void State::turn(const int direction)
 {
-    // R
-    if (direction == "R")
+    // directions = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
+    const std::vector<std::vector<int>> tapes{
+        {1, 3, 9, 11, 21, 23, 18, 16},
+        {16, 18, 23, 21, 11, 9, 3, 1},
+        {16, 18, 23, 21, 11, 9, 3, 1},
+        {5, 7, 20, 21, 14, 12, 3, 2},
+        {2, 3, 12, 14, 21, 20, 7, 5},
+        {2, 3, 12, 14, 21, 20, 7, 5},
+        {19, 18, 15, 14, 11, 10, 7, 6},
+        {6, 7, 10, 11, 14, 15, 18, 19},
+        {6, 7, 10, 11, 14, 15, 18, 19}};
+
+    const std::vector<std::vector<int>> faces{
+        {14, 15, 13, 12},
+        {12, 13, 15, 14},
+        {12, 13, 15, 14},
+        {10, 11, 9, 8},
+        {8, 9, 11, 10},
+        {8, 9, 11, 10},
+        {22, 23, 21, 20},
+        {20, 21, 23, 22},
+        {20, 21, 23, 22}};
+
+    _turn(tapes[direction], faces[direction]);
+
+    if (direction % 3 == 2)
     {
-        int tape[8] = {1, 3, 9, 11, 21, 23, 18, 16};
-        int face[4] = {14, 15, 13, 12};
-        _turn(tape, face);
+        _turn(tapes[direction], faces[direction]);
     }
-    else if (direction == "R'")
-    {
-        int tape[8] = {16, 18, 23, 21, 11, 9, 3, 1};
-        int face[4] = {12, 13, 15, 14};
-        _turn(tape, face);
-    }
-    else if (direction == "R2")
-    {
-        int tape[8] = {16, 18, 23, 21, 11, 9, 3, 1};
-        int face[4] = {12, 13, 15, 14};
-        _turn(tape, face);
-        _turn(tape, face);
-    }
-    else if (direction == "U")
-    {
-        int tape[8] = {5, 7, 20, 21, 14, 12, 3, 2};
-        int face[4] = {10, 11, 9, 8};
-        _turn(tape, face);
-    }
-    else if (direction == "U'")
-    {
-        int tape[8] = {2, 3, 12, 14, 21, 20, 7, 5};
-        int face[4] = {8, 9, 11, 10};
-        _turn(tape, face);
-    }
-    else if (direction == "U2")
-    {
-        int tape[8] = {2, 3, 12, 14, 21, 20, 7, 5};
-        int face[4] = {8, 9, 11, 10};
-        _turn(tape, face);
-        _turn(tape, face);
-    }
-    else if (direction == "F")
-    {
-        int tape[8] = {19, 18, 15, 14, 11, 10, 7, 6};
-        int face[4] = {22, 23, 21, 20};
-        _turn(tape, face);
-    }
-    else if (direction == "F'")
-    {
-        int tape[8] = {6, 7, 10, 11, 14, 15, 18, 19};
-        int face[4] = {20, 21, 23, 22};
-        _turn(tape, face);
-    }
-    else if (direction == "F2")
-    {
-        int tape[8] = {6, 7, 10, 11, 14, 15, 18, 19};
-        int face[4] = {20, 21, 23, 22};
-        _turn(tape, face);
-        _turn(tape, face);
-    }
-    else
-    {
-        cout << "Invalid direction: " << direction << endl;
-    }
+
     moves.push_back(direction);
 }
 
-void state::_turn(const int tape[8], const int face[4])
+void State::_turn(const std::vector<int> &tape, const std::vector<int> &face)
 {
-    char temp;
+    int temp;
     for (int j = 0; j < 2; ++j)
     {
         temp = cube[tape[j]];
@@ -149,169 +122,473 @@ void state::_turn(const int tape[8], const int face[4])
     cube[face[3]] = temp;
 }
 
-int state::solve(vector<string> &output)
+void State::scramble()
 {
-    int visited = 0;
+    int numMoves = 100;
+    int prevFace = -1;
+    int direction;
+    std::mt19937 random(std::time(0));
+    // std::mt19937 random(0);
 
-    queue<state> scrambledQ;
-    queue<state> solvedQ;
-
-    state currScrambled = state(cube, moves);
-    scrambledQ.push(currScrambled);
-
-    state currSolved;
-    solvedQ.push(currSolved);
-
-    unordered_map<string, vector<string>> scrambledMap;
-    unordered_map<string, vector<string>> solvedMap;
-
-    while (!scrambledQ.empty())
-    {
-        visited += 2;
-        currScrambled = scrambledQ.front();
-        scrambledQ.pop();
-
-        currSolved = solvedQ.front();
-        solvedQ.pop();
-
-        auto findScrambled = scrambledMap.find(currScrambled.cube);
-        auto findSolved = solvedMap.find(currSolved.cube);
-
-        auto findScramSolv = solvedMap.find(currScrambled.cube); // find scrambled in solve
-        auto findSolvScram = scrambledMap.find(currSolved.cube); // find solved in scramble
-
-        if (findScrambled != scrambledMap.end() && findSolved != solvedMap.end())
-        {
-            // do nothing
-        }
-        else if (findScramSolv != solvedMap.end()) // if scrambled is in solvedMap
-        {
-            for (unsigned int i = 0; i < currScrambled.moves.size(); ++i)
-            {
-                output.push_back(currScrambled.moves.at(i));
-            }
-            reverse(findScramSolv->second);
-            for (unsigned int i = 0; i < findScramSolv->second.size(); ++i)
-            {
-                output.push_back(findScramSolv->second.at(i));
-            }
-            return visited;
-        }
-        else if (findSolvScram != scrambledMap.end()) // if solved is in scrambledMap
-        {
-            for (unsigned int i = 0; i < findSolvScram->second.size(); ++i)
-            {
-                output.push_back(findSolvScram->second.at(i));
-            }
-            reverse(currSolved.moves);
-            for (unsigned int i = 0; i < currSolved.moves.size(); ++i)
-            {
-                output.push_back(currSolved.moves.at(i));
-            }
-            return visited;
-        }
-        else if (findScrambled == scrambledMap.end() && findSolved == solvedMap.end()) // if they're both new
-        {
-            scrambledMap.insert({currScrambled.cube, currScrambled.moves});
-            solvedMap.insert({currSolved.cube, currSolved.moves});
-
-            // thread thread1(&state::move, this, currScrambled, std::ref(scrambledQ));
-            // thread thread2(&state::move, this, currSolved, std::ref(solvedQ));
-            // thread1.join();
-            // thread2.join();
-            move(currScrambled, scrambledQ);
-            move(currSolved, solvedQ);
-        }
-        else if (findScrambled == scrambledMap.end())
-        {
-            scrambledMap.insert({currScrambled.cube, currScrambled.moves});
-            move(currScrambled, scrambledQ);
-        }
-        else if (findSolved == solvedMap.end())
-        {
-            solvedMap.insert({currSolved.cube, currSolved.moves});
-            move(currSolved, solvedQ);
-        }
-    }
-    return 0;
-}
-
-void state::reverse(vector<string> &turns)
-{
-    int size = turns.size();
-    vector<string> temp(size);
-    temp.reserve(size);
-    for (unsigned int i = 0; i < size; ++i)
-    {
-        if (turns.at(i).size() == 1)
-        {
-            temp.at(size - i - 1) = (turns.at(i) + "'");
-        }
-        else if (turns.at(i).at(1) == '\'')
-        {
-            temp.at(size - i - 1) = turns.at(i).at(0);
-        }
-        else
-        {
-            temp.at(size - i - 1) = turns.at(i);
-        }
-    }
-    turns = temp;
-}
-
-void state::scramble(vector<string> &scramble)
-{
-    if (scramble.size() != 0)
-    {
-        for (int i = 0; i < scramble.size(); ++i)
-        {
-            turn(scramble.at(i));
-        }
-        moves = {};
-        return;
-    }
-    string possibleMoves[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
-
-    int numMoves = 20;
-    scramble.reserve(numMoves);
-    char temp = ' ';
-    string move;
+    std::cout << "scramble: \t";
     for (int i = 0; i < numMoves; ++i)
     {
-        if (scramble.size() != 0)
+        direction = random() % 9;
+        if ((direction / 3) != prevFace)
         {
-            temp = scramble.back().at(0);
-        }
-        move = possibleMoves[rand() % 9];
-        if (move.at(0) != temp)
-        {
-            scramble.push_back(move);
-            turn(move);
+            turn(direction);
+            prevFace = direction / 3;
+            std::cout << direction << " ";
         }
         else
         {
             --i;
         }
     }
+    std::cout << std::endl;
     moves = {};
 }
 
-void state::move(const state &currState, queue<state> &currQ)
+bool State::check()
 {
-    char temp;
-    string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
-    temp = ' ';
-    if (currState.moves.size() != 0)
+    for (int i = 0; i < 24; ++i)
     {
-        temp = (currState.moves.back()).at(0);
+        if (cube[i] != i)
+            return false;
     }
-    for (unsigned int i = 0; i < 9; ++i)
+    return true;
+}
+
+void State::computePattern(std::vector<std::vector<int>> &pattern)
+{
+    // returns pattern database in pattern
+    State curr;
+    State newState;
+
+    bool done = false;
+    std::string rotations[9] = {"R", "R'", "R2", "U", "U'", "U2", "F", "F'", "F2"};
+
+    std::queue<State> q;
+
+    for (int i = 0; i < 24; ++i)
     {
-        if (rotations[i].at(0) != temp)
+        for (int j = 0; j < 24; ++j)
         {
-            state newState = state(currState.cube, currState.moves);
-            newState.turn(rotations[i]);
-            currQ.push(newState);
+            if (((i == j || i == 0) || (i == 4) || (i == 17)) || ((j == 0) || (j == 4) || (j == 17)))
+            {
+                pattern[i][j] = 0;
+            }
+            else
+            {
+                pattern[i][j] = -1;
+            }
         }
     }
+    q.push(curr);
+
+    while (curr.moves.size() < 4)
+    {
+        curr = q.front();
+        q.pop();
+
+        for (int i = 0; i < 9; ++i)
+        {
+            newState = curr;
+
+            // turn cube
+            newState.turn(i);
+
+            // check cube
+            for (int j = 0; j < 24; ++j)
+            {
+                // if not in the correct position
+                if (newState.cube[j] != j)
+                {
+                    if (pattern[j][newState.cube[j]] == -1)
+                    {
+                        pattern[j][newState.cube[j]] = newState.moves.size();
+                    }
+                }
+            }
+            q.push(newState);
+        }
+    }
+}
+
+bool State::iddfs(int& count)
+{
+    auto start = std::chrono::high_resolution_clock::now();
+    bool found = false;
+
+    for (int i = 0; i < 11; ++i)
+    {
+        if (dls(i, count))
+        {
+            found = true;
+            break;
+        }
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = end - start;
+
+    std::cout << "average visited per second " << count / std::chrono::duration<double>(diff).count() << std::endl;
+    return found;
+}
+
+bool State::dls(int limit, int &count)
+{
+    // if at max depth, check if solved
+    if (limit == 0)
+    {
+        if (check())
+        {
+            std::cout << "solution found " << moves.size();
+            return true;
+        }
+        return false;
+    }
+
+    // recurrence dfs
+    State newState;
+    int prevFace = -1;
+    std::string cubeStr;
+    if (moves.size() != 0)
+    {
+        prevFace = moves.back() / 3;
+    }
+    for (int i = 0; i < 9; ++i)
+    {
+        // skip if moving same face
+        if (prevFace != i / 3)
+        {
+            newState = *this;
+            newState.turn(i);
+            count++;
+
+            if (newState.dls(limit - 1, count))
+                return true;
+        }
+    }
+
+    // goal not found
+    return false;
+}
+
+bool State::biddfs(int& count)
+{
+    std::unordered_map<std::string, State> edges1;
+    std::unordered_map<std::string, State> edges2;
+    bool solved;
+    for (int k = 0; k < 6; ++k)
+    {
+        // std::cout << "k:\t" << k << std::endl;
+        edges1.clear();
+        State goal1;
+        goal1.biddfs_goal(k, edges1, count);
+
+        edges2.clear();
+        State goal2;
+        goal2.biddfs_goal(k + 1, edges2, count);
+
+        std::unordered_map<std::string, int> visited;
+
+        std::stack<State> frontier;
+        frontier.push(*this);
+        State curr;
+
+        int prevFace;
+        bool solved = false;
+        int solution;
+
+        std::string cubeStr;
+        cubeStr.reserve(38);
+
+        while (!frontier.empty())
+        {
+            curr = frontier.top();
+            frontier.pop();
+            count++;
+
+            // if curr is at limit, compare to goal edges
+            if (curr.moves.size() == k)
+            {
+                cubeStr = "";
+                cubeStr.reserve(38);
+                for (int j = 0; j < 24; ++j)
+                {
+                    cubeStr += std::to_string(curr.cube[j]);
+                }
+
+                auto it = edges1.find(cubeStr);
+                if (it != edges1.end())
+                {
+                    std::cout << "solution found in " << it->second.moves.size() + curr.moves.size() << std::endl;
+                    return true;
+                }
+                it = edges2.find(cubeStr);
+                if (it != edges2.end())
+                {
+                    solved = true;
+                    solution = it->second.moves.size() + curr.moves.size();
+                }
+            }
+            else
+            {
+                if (curr.moves.size() != 0)
+                {
+                    prevFace = curr.moves.back() / 3;
+                }
+                else
+                {
+                    prevFace = -1;
+                }
+
+                for (int i = 0; i < 9; ++i)
+                {
+                    // skip if moving same face
+                    if (prevFace != i / 3)
+                    {
+                        State newState = curr;
+                        newState.turn(i);
+
+                        cubeStr = "";
+                        cubeStr.reserve(38);
+
+                        for (int j = 0; j < 24; ++j)
+                        {
+                            cubeStr += std::to_string(newState.cube[j]);
+                        }
+
+                        // if is not already visited, add to stack
+                        if (visited.count(cubeStr) == 0)
+                        {
+                            visited[cubeStr] = newState.moves.size();
+                            frontier.push(newState);
+                        }
+                        // elif already visited and improved, add to stack
+                        else if (visited[cubeStr] > newState.moves.size())
+                        {
+                            visited[cubeStr] = newState.moves.size();
+                            frontier.push(newState);
+                        }
+                    }
+                }
+            }
+        }
+        if (solved)
+        {
+            std::cout << "solution found in " << solution << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
+void State::biddfs_goal(int limit, std::unordered_map<std::string, State> &edges, int& count)
+{
+    std::unordered_map<std::string, int> visited;
+
+    std::stack<State> frontier;
+    frontier.push(*this);
+    State curr;
+
+    int prevFace;
+    bool solved = true;
+
+    std::string cubeStr;
+    cubeStr.reserve(38);
+
+    while (!frontier.empty())
+    {
+        curr = frontier.top();
+        frontier.pop();
+
+        // if curr is at limit, add to edges
+        if (curr.moves.size() == limit)
+        {
+            cubeStr = "";
+            cubeStr.reserve(38);
+
+            for (int j = 0; j < 24; ++j)
+            {
+                cubeStr += std::to_string(curr.cube[j]);
+            }
+            edges[cubeStr] = curr;
+        }
+        else
+        {
+            if (curr.moves.size() != 0)
+            {
+                prevFace = curr.moves.back() / 3;
+            }
+            else
+            {
+                prevFace = -1;
+            }
+
+            for (int i = 0; i < 9; ++i)
+            {
+                // skip if moving same face
+                if (prevFace != i / 3)
+                {
+                    State newState = curr;
+                    newState.turn(i);
+
+                    cubeStr = "";
+                    cubeStr.reserve(38);
+
+                    for (int j = 0; j < 24; ++j)
+                    {
+                        cubeStr += std::to_string(newState.cube[j]);
+                    }
+
+                    // if is not already visited, add to stack
+                    if (visited.count(cubeStr) == 0)
+                    {
+                        visited[cubeStr] = newState.moves.size();
+                        frontier.push(newState);
+                    }
+                    // elif already visited and improved, add to stack
+                    else if (visited[cubeStr] > newState.moves.size())
+                    {
+                        visited[cubeStr] = newState.moves.size();
+                        frontier.push(newState);
+                    }
+                    count++;
+                }
+            }
+        }
+    }
+}
+
+int State::misplacedHeuristic()
+{
+    // returns the number of misplaced tiles
+    int count = 0;
+    for (int i = 0; i < 24; ++i)
+    {
+        if (cube[i] != i)
+            count++;
+    }
+    return count;
+}
+
+double State::patternHeuristic(std::vector<std::vector<int>> &pattern)
+{
+    double total = 0;
+    for (int i = 0; i < 24; ++i)
+    {
+        total += pattern[i][cube[i]];
+    }
+    return total / 12.0;
+}
+
+bool State::ida(int &count)
+{
+    std::vector<std::vector<int>> pattern(
+        24,
+        std::vector<int>(24));
+    computePattern(pattern);
+    int threshold = patternHeuristic(pattern);
+
+    return idaHelper(threshold, pattern, count);
+}
+
+bool State::idaHelper(double threshold, std::vector<std::vector<int>> &pattern, int &count)
+{
+    // std::cout << "curr threshold\t:" << threshold << std::endl;
+    double min = MAXFLOAT;
+    std::stack<State> frontier;
+    frontier.push(*this);
+    State curr;
+
+    int prevFace;
+    double f;
+
+    while (!frontier.empty())
+    {
+        curr = frontier.top();
+        frontier.pop();
+        count++;
+
+        // check if solution
+        if (curr.check())
+        {
+            std::cout << "solution found in\t" << curr.moves.size() << std::endl;
+            return true;
+        }
+        if (curr.moves.size() != 0)
+        {
+            prevFace = curr.moves.back() / 3;
+        }
+        else
+        {
+            prevFace = -1;
+        }
+
+        for (int i = 0; i < 9; ++i)
+        {
+            // skip if moving same face
+            if (prevFace != i / 3)
+            {
+                State newState = curr;
+                newState.turn(i);
+
+                f = newState.moves.size() + newState.patternHeuristic(pattern);
+                if (f <= threshold)
+                {
+                    frontier.push(newState);
+                }
+                else if (f < min)
+                {
+                    min = f;
+                }
+            }
+        }
+    }
+    // once frontier is completed, re run with new threshold
+    return idaHelper(min, pattern, count);
+}
+
+void State::testBench()
+{
+    int count = 0;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    // cube[0] = -1;
+    std::unordered_map<std::string, int> visited;
+
+    // dls(12, visited, count);
+
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = end - start;
+
+    std::cout << "visited: " << count << std::endl
+              << "average visited per second " << count / std::chrono::duration<double>(diff).count() << std::endl;
+}
+
+void State::testBench2()
+{
+    State state;
+
+    std::unordered_map<std::string, int> temp;
+    int count = 0;
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int i = 0; i < 1; ++i)
+    {
+        state.scramble();
+        // state.biddfs();
+        state.ida(count);
+        // state.biddfs(count);
+        // state.iddfs(count);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = end - start;
+
+    std::cout << "visited: " << count << std::endl
+              << "average visited per second " << count / std::chrono::duration<double>(diff).count() << std::endl;
 }

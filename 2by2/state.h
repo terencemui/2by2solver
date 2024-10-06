@@ -4,23 +4,36 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <unordered_map>
 
-using namespace std;
-
-struct state
+class State
 {
-    string cube;
-    vector<string> moves;
+    public:
+        std::array<int, 24> cube;
+        std::vector<int> moves;
 
-    state();
-    state(const string&, vector<string>);
+    public:
+        State();
+        State& operator=(const State&);
+        void printState();
+        void turn(const int);
+        void _turn(const std::vector<int>&, const std::vector<int>&);
+        void scramble();
+        bool check();
 
-    void printCube();
-    void turn(const string &);
-    void _turn(const int[8], const int[4]);
-    int solve(vector<string>&);
-    void reverse(vector<string>&);
-    void scramble(vector<string>&);
-    void move(state&, queue<state>&);
+        void computePattern(std::vector<std::vector<int>>&);
+
+        bool iddfs(int&);
+        bool dls(int, int&);
+        bool biddfs(int&);
+        void biddfs_goal(int, std::unordered_map<std::string, State>&, int&);
+        int misplacedHeuristic();
+        double patternHeuristic(std::vector<std::vector<int>>&);
+        bool ida(int&);
+        bool idaHelper(double, std::vector<std::vector<int>>&, int&);
+
+
+        void testBench();
+        void testBench2();
 };
 #endif
